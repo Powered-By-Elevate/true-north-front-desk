@@ -166,11 +166,11 @@
               <div class="two">
                 <div class="field">
                   <label for="ghOwner">GitHub owner</label>
-                  <input type="text" id="ghOwner" placeholder="powered-by-elevate">
+                  <input type="text" id="ghOwner" placeholder="Powered-By-Elevate">
                 </div>
                 <div class="field">
                   <label for="ghRepo">Repository</label>
-                  <input type="text" id="ghRepo" placeholder="true-north-launchpad">
+                  <input type="text" id="ghRepo" placeholder="true-north-front-desk">
                 </div>
               </div>
               <div class="two">
@@ -180,7 +180,7 @@
                 </div>
                 <div class="field">
                   <label for="ghPath">File path</label>
-                  <input type="text" id="ghPath" placeholder="apps.json">
+                  <input type="text" id="ghPath" placeholder="launchpad/apps.json">
                 </div>
               </div>
               <div class="field">
@@ -608,17 +608,19 @@ function cfg() {
 }
 function loadCfg() {
   const c = cfg();
-  $('ghOwner').value  = c.owner  || 'powered-by-elevate';
-  $('ghRepo').value   = c.repo   || '';
+  // Defaults point at where the Launchpad is actually served from today, so the
+  // Publish button works on first open with nothing to fill in but the token.
+  $('ghOwner').value  = c.owner  || 'Powered-By-Elevate';
+  $('ghRepo').value   = c.repo   || 'true-north-front-desk';
   $('ghBranch').value = c.branch || 'main';
-  $('ghPath').value   = c.path   || 'apps.json';
+  $('ghPath').value   = c.path   || 'launchpad/apps.json';
   $('ghToken').value  = c.token  || '';
 }
 $('saveCfg').onclick = () => {
   try {
     localStorage.setItem(CFG, JSON.stringify({
       owner: $('ghOwner').value.trim(), repo: $('ghRepo').value.trim(),
-      branch: $('ghBranch').value.trim() || 'main', path: $('ghPath').value.trim() || 'apps.json',
+      branch: $('ghBranch').value.trim() || 'main', path: $('ghPath').value.trim() || 'launchpad/apps.json',
       token: $('ghToken').value.trim()
     }));
     $('cfgMsg').textContent = 'Saved in this browser.';
@@ -629,7 +631,7 @@ $('saveCfg').onclick = () => {
 $('publish').onclick = async () => {
   const c = {
     owner: $('ghOwner').value.trim(), repo: $('ghRepo').value.trim(),
-    branch: $('ghBranch').value.trim() || 'main', path: $('ghPath').value.trim() || 'apps.json',
+    branch: $('ghBranch').value.trim() || 'main', path: $('ghPath').value.trim() || 'launchpad/apps.json',
     token: $('ghToken').value.trim()
   };
   if (!c.owner || !c.repo || !c.token)
