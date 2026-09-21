@@ -1,5 +1,5 @@
 {
-  "$comment": "The Launchpad inventory. Edit through edit.html, not by hand.",
+  "$comment": "The Launchpad inventory. Primary route: ask Claude to change it (reads and writes this file straight over the GitHub API, see tools/launcher/ROLLOUT.md in agentic-os). Fallback with no Claude: open edit.html beside this file. Editing by hand is the last resort, and a trailing comma here blanks nothing because index.html falls back to its baked copy.",
   "categories": [
     {
       "id": "comms",
@@ -91,6 +91,20 @@
     },
     {
       "cat": "finance",
+      "name": "ADP",
+      "desc": "Time off, benefits, pay stubs",
+      "url": "https://my.adp.com",
+      "mark": "adp"
+    },
+    {
+      "cat": "finance",
+      "name": "Cortavo",
+      "desc": "Raise a ticket, reset a password",
+      "url": "https://portal.cortavo.com/",
+      "mark": "cortavo"
+    },
+    {
+      "cat": "finance",
       "name": "Financial Dashboard",
       "desc": "Backlog, WIP, revenue bridge",
       "url": null,
@@ -149,20 +163,6 @@
       "url": "https://www.office.com/launch/powerpoint",
       "mark": "powerpoint",
       "desktop": "ms-powerpoint:"
-    },
-    {
-      "cat": "finance",
-      "name": "ADP",
-      "desc": "Time off, benefits, pay stubs",
-      "url": "https://my.adp.com",
-      "mark": "adp"
-    },
-    {
-      "cat": "finance",
-      "name": "Cortavo",
-      "desc": "Raise a ticket, reset a password",
-      "url": "https://portal.cortavo.com/",
-      "mark": "cortavo"
     }
   ]
 }
