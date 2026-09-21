@@ -20,6 +20,10 @@
     {
       "id": "create",
       "label": "Create"
+    },
+    {
+      "id": "companies",
+      "label": "Our companies"
     }
   ],
   "apps": [
@@ -160,6 +164,41 @@
       "desc": "Decks and presentations",
       "url": "https://www.office.com/launch/powerpoint",
       "mark": "powerpoint"
+    },
+    {
+      "cat": "companies",
+      "name": "True North Companies",
+      "desc": "Parent company, public site",
+      "url": "https://true-north-companies.com/",
+      "mark": "life"
+    },
+    {
+      "cat": "companies",
+      "name": "True North K-12",
+      "desc": "TNK12 schools, public site",
+      "url": "https://truenorth-k12.com/",
+      "mark": "life"
+    },
+    {
+      "cat": "companies",
+      "name": "True North Holdings",
+      "desc": "Holdings, public site",
+      "url": "https://www.true-north-holdings.com/",
+      "mark": "life"
+    },
+    {
+      "cat": "companies",
+      "name": "True Places",
+      "desc": "True Places Development, public site",
+      "url": "https://www.trueplacesdevelopment.com/",
+      "mark": "life"
+    },
+    {
+      "cat": "companies",
+      "name": "Elevate",
+      "desc": "Elevate Managed Services, public site",
+      "url": "https://elevatemanagedservices.com/",
+      "mark": "life"
     }
   ]
 }
