@@ -1,5 +1,5 @@
 {
-  "$comment": "The Launchpad inventory. Edit through edit.html, not by hand.",
+  "$comment": "The Launchpad inventory. Primary route: ask Claude to change it (reads and writes this file straight over the GitHub API, see tools/launcher/ROLLOUT.md in agentic-os). Fallback with no Claude: open edit.html beside this file. Editing by hand is the last resort, and a trailing comma here blanks nothing because index.html falls back to its baked copy.",
   "categories": [
     {
       "id": "comms",
@@ -20,6 +20,10 @@
     {
       "id": "create",
       "label": "Create"
+    },
+    {
+      "id": "companies",
+      "label": "Our companies"
     }
   ],
   "apps": [
@@ -51,7 +55,6 @@
       "name": "OneDrive",
       "desc": "Your own files, synced",
       "url": "https://www.office.com/launch/onedrive",
-      "desktop": "onedrive:",
       "mark": "onedrive"
     },
     {
@@ -88,6 +91,20 @@
       "desc": "Cards, bills, expense reports",
       "url": "https://app.ramp.com",
       "mark": "ramp"
+    },
+    {
+      "cat": "finance",
+      "name": "ADP",
+      "desc": "Time off, benefits, pay stubs",
+      "url": "https://my.adp.com",
+      "mark": "adp"
+    },
+    {
+      "cat": "finance",
+      "name": "Cortavo",
+      "desc": "Raise a ticket, reset a password",
+      "url": "https://portal.cortavo.com/",
+      "mark": "cortavo"
     },
     {
       "cat": "finance",
@@ -131,38 +148,61 @@
       "name": "Excel",
       "desc": "Proformas and financial models",
       "url": "https://www.office.com/launch/excel",
-      "mark": "excel",
-      "desktop": "ms-excel:"
+      "mark": "excel"
     },
     {
       "cat": "create",
       "name": "Word",
       "desc": "Letters, memos, proposals",
       "url": "https://www.office.com/launch/word",
-      "mark": "word",
-      "desktop": "ms-word:"
+      "mark": "word"
     },
     {
       "cat": "create",
       "name": "PowerPoint",
       "desc": "Decks and presentations",
       "url": "https://www.office.com/launch/powerpoint",
-      "mark": "powerpoint",
-      "desktop": "ms-powerpoint:"
+      "mark": "powerpoint"
     },
     {
-      "cat": "finance",
-      "name": "ADP",
-      "desc": "Time off, benefits, pay stubs",
-      "url": "https://my.adp.com",
-      "mark": "adp"
+      "cat": "companies",
+      "name": "True North Companies",
+      "desc": "Commercial real estate development and construction",
+      "url": "https://true-north-companies.com/",
+      "mark": "life",
+      "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAAYFBMVEUAYqAAAAAGZZkAX5cAYJ4ScHf//wBrcnEA/v7///8UoKQAAP8OKHhcpmF5+3n/AABWp6UA/wAlqGx0dAz/AP9ZWqgHd+wxeDF3CXd8+gd8fP//fwASNbSrq1dsrid4//yQbctYAAAAIHRSTlOxABpfwwUBAwEBBgEDBAIBAwEFAgEDAwMCAgICBAMEAi0zOG4AAA8ESURBVHjarVvpequ6DrUFso2ZIUMzNe//llceIIBFku5z+bP317p4Wda4JIT8w2MQESrkf3m9aikrEABY/uGd4g+bV/G/A3CPvhbdOa4goOb/B0CpePj4ctoso0esngxUIQHB+o3LClGtX/CPAIwxrRLnafew97RpvngEuF87YLQm/K3GrqB/iuLW/jOAomi0fjyaIWwOYfOw4/LJ88wDEO7HHgOQHghR6ItqGnH4ZwBNIYQNR5p2F5u9w89EZgOA8EuHwd8b2Eap7vrvAIQ+zqIPRxf8EwFEAXml8Bhq0dWd/mcAQkO8W/HhcQBUJvJZJF4MpH2/Fh7/qoTGHgn7aTr8ewCwAhDWEwTCZYMEyj8BUKptpRGtM7qMv/f3AKIY6CKOKLW3pz8B0E2hEbzqiW/29wDkBoD/O6+OgIMuLuovAOp6bIPmf7H7BADEdu0MAY9X9RcABrWQAjLx7RMB7PxOUJA4qT9cQQlj0P3vju83MTsAghCcY8Q/AEC3vxBvtt/ctnD6DrtrM0Bpvwbg/GgLe8dnvdEMIN8B6xWhqsi0PgIwLuIjZO+OL7bhkACAF9rOneUBwbEzHwEYS+Znd8QfnGyINrDdQHrYO0YbFEHj8OkKjBnUm5OE3f1lrkxkAhCjNXdJYcmAHwBYg1Jk+9oMd789GSkDAAiC3XWdfk2Bl/4tALIm9vwxwGG8JsDj1kk4CbRT6BTMFQYZjBtrXAMoKWJYTv386V3EJQ053dHYYWOm9PJCag0nn5IC68ICgp9qB0DfFC2h04z++b8MmRblGKR93SA2huLfXVutNRazFLj30A54lYoF0GBNf8mqv/e0JSXGzooOB9k0DADSnvqmKD+uYKukK1sAigsMgLYY6A4Z+8/j5R9iRO9vNx9d10vdqlbU4uASwJKCub+HPH0ZvesHuCtoO33+SffPp0CDEAEYNaJDJDZradmtbgoPoNKTEHLGFCSUDACDSrL+j5SvrH7EJDVsfGkAqet3EUfEqG+sc/0AHAJytFonANAAYwDRhd5Rz7n98CA5ZZPnXS8tdf3bR40aBhuvgZGBBgaAtJAld+YFBlC8Ls0JKv48AUAi0FNOdyGnXnG6SGpQSbguABSFUjddpBcQVFsNaNrXRREYD6DcWExQlpebocDX1JqRgUdKtqJ8iuQBCFV3P/z+dIShcW+Lz8nGhe60kBSI8hXu3J8IQMkpFqkB6IDAAWhvFwucwmRwkMI2K1eNUbczhzzjkoJVbUcSMczJ3KLKkOQ9gAMJABKg4fy2uzSrVAkmALCjBQsASqqak0GMnTMAWUBLGpgICigvskKJRQ5BWjWZfwogFEi4rC6UMniuhlQTM+EByAkAh5J2GAc9Uo37ctez9ftDqI3jdlU6aTjdQ/+CUMPJnW690AlQ39zRHAClQw6UKgoFB2meM4D6t1oABSm2RhYvoTf9QghP2LnfG0YA6/cuFWAdulUtynkdrRjGxNnST0WJ56FYsUcgGHfg/Nu19ABwZEwFrO7EKoMULp2CFUTEBLhPTGwhl2UIaMmcEOX95AEYZPyVc5e1WBUz3rUuX5P5S0gj94Hi2qoOc9BFKmJ3x/QGo49UCaUXoOp6TVbY7VXSopa/XQ3rtKdJzhhyE6E9AFkmN0DZoxbLdK3vkTV7lwjnif+ivGuVfyu8VLi1cydAB4AixsYJRhMr+lmXe9UM4Mrv1O+kOXTw9aQ/6mUK40OkWgDCcRAewFY6ZM0KXtYsmxpd1p/uRD6EuYSQf9fNwhY1bCu3aLLCUSdJULHyZ8UWHI8Veas0x/Oe9wkpL+HEWwu94Of4G5QoQt6Sp+9d/C0eufQqHgFTE4ppHKBelVwi0YIJQJrZtEsXhBc+r6BNKoUWuUAeMomlHeFZ4lbSnaw4APSn4/Aqlqfzs9nlQ4iTBNjJ5KGqFnL0APLNEoFJcumMaxxnZlqymZ3HOWL9UA/rjDFJwGPAltVEnCMeIDmq9QDSvGZKrEyFO1xJ1DNlKEnXXZKiz/GMXnW2RnktrJwItmoolu4t9/xiRuGTtEeftc9d8c3+gzf1FiRf0EQhgHVSMOctjxZeQrnl0pVFH61V0QgXCoATf/jTA3ZmMjHYHG5elrkEQVJYK4rLkOoSAaCEIVtfAHZU40dOK9C03P5H2TkmPMZpXgYi0LXRGTVdkeq7FKIODZDw0IEpDHc+DBrY4RqCAdTDcwJQCGtR8iV54M2hcwDEhnsgAFr8XhCnto/7D9Z1oCHsHkfu9tfyONTF5OzN80HxDvaJLcKgCmN/5T0pqUXHEZj4ahDwTIvsyAjntMdoJewOS5ZHakdfDeKdAXAya4qkNNPue5yf9zCkf2oR7VRv7Lnni9tAbGlNtnCXKYBy236bKEC2Q+DjjJBHSMn3Tp43Mph6BuGJyxIAcqGCi733+EafBg087ev8xkYTY/MoZIYVAGy5tUzsEry7+1NypkdOc+r690UJ5JP+y/124wQgXz3vt0eXFzxHFkBT1yQaO3nO+fAW1v3G1RuFBJF/f3xBx7eiYVuRSuvi2YlI2LrTmzLE072On9MoYbJvAOSTT2vJratLu9fhldchdBogqul8dE66XgLddwDC7Qfl43svbUA1Oio0rBhne36j0wI/A5j0yWcn6lOXvcFx1rt4+HfH+gbAFFHQyVV9QGBkrdHWU6/3bc/nmyuYTo8+uQH9RbN/og6yry72DYB4c0tfIhE+TUeocUriPne8PIDmrQTi7vp2iO60ewtA9f3jYSR8aHitAPRpWZEvzh47BF6iXhOO5AukZq+ilOrXl/DZd/tHqmbHEWUv0SNOR3KeUIpm1LpkDeD3d/z6+JMjSgFkU1cqnl4v9CkUPFgUTZ/s3yvKbchTZ2+3XPojFsBS7svRhVfjgkTSacYY+xCL3vQbl0cMgcmH4zTdONF9XosQRtaZSR7IK9Gx4bh9127NxaLl5x7rg5RIcxRfcpcVvHpweeqTz2PSbz3u7p+v+o1gTxN1Q7JOeANKOI++ZA0FyV5O/LsNyGeU/dt+I2XGfO94m8e5/qY4F2YPwFS82cPslo0hw9R8RuhrrWVm8gEApepGVnVTdHNuupeX1pcJQKFFfXvbb/SrKnhVANNTiYT19y9/FjdV3mHXpp0Mfptidv9gds7vt68CyK5pN5mRrw1J1Ft6grLuqejhIQSmdSoNFdUyvjbcLU+ltnao62LOWd3FhAEwAdsmsItliE1RiLEeShlyPAYBymNsTvTkFXCnMgxMjRaNGn+HMGuVr6tjTHjqDFvh2p/icfYZELDdt0ASlmostEVudmE+PlZaNxdZYs/RVDxB0TiGXIXBQGf1rC46Evw8jgVaN+y0029E8IegCy0rhgwKAFKOqDdiUyvudN90rWosdigkP8+24IhasWEKMzBG8I0XA8vdj1z1H5ja+oyMA/BBo5AlLAYrU0LUtzCdBMS2/bbhCcvqziOgM6r4XpZCvOOy7P1JCVHHE7rmBqRZwr1fMZWd3Ovq6aravjdOa2i4LvoWVVnxTGkqmjCV1Nv1ROs1tTQ3xnhoZUKD+1dfNbqo9opVe1StPFVbAjF0ga2r+ic5aDzJBIE/6Q+dlPPUqBe7K/EAeWK6jKUDACUw/QIJjXgBcN6A87ahXshS87jDKleqHz8a0nb/WBGAsjxKwzR0yk6IZRViLKXGWTpLatZGGhmcZdbaX5TmeoyxYRGuJ3EiT/LfTbusQmvkWk8whLGvhfRQ3vU6Vxsw3SKDqtUBAKqSgVcIWPMgv81guB6V1IufhnbJhkCxloUuxRGDBJ5Vt+n8hN93yxepiyP6MG2wWv0yozCoA1CsSkhAZjbCDbcVoXHZCM3rl3aObFJEJYt6BPYksxbHlllTTAAcRVE6oh6Y3toBY+9YiZrVEcQTKtU0K2suE3WJhpDPQ3WvHoF5Xg9kZocEdu5052cCQLJu9lrsZ9LgBYD7gdXmWcWcAiz65+YqbnDUkrEekNWPG0wRwU8I5Bf1eL4dDkuPjkmPLZtGBGLfdql+h5vanR+o5hmSslS/Vh63IWVqTJ7WVBzXMS8jANdvXFsA1B0XRQizqXxfcAJgsNydIRErABrYuQkII/Y41uvpSJZB9nm9mQG4MQcyBA3syHjlqpcXMzN0aVRy7Bn4Sk/aFYmEcOWjaEkn6ecJCgIgVacZqOF0R2HNy661SJ0apXtuoAWwXPhghcCe360v8Ve/AMzdSeTTHimsLYppPkentUzm8j5X+qH7bfw0Qj2O1W4mpWdBLWfJ9pYPbsR+sMU0S9aeQCRtJgpU4PoY2sRiSfMzfSGEv6YaFwoGzWmAvWE+JYZmmvlqtxW1d2uu2dLKQ3ScxU+7M0nmh3N+SgaAfp6S3uYrv7bThy6GGXt1Qq1Ipw/FVE+R9+NeFkcDhtdk6wJA8SQ14Pp/00QjhW+NpTFss1U7oRIA94VPuVvUxdmCQTEATCNGdpzl5W+F0K4hzpUS9KOzLkhVUQZRYbZbV9cdO9TqjAKrnzf9P5goM8P1u10RJWImDvv9Rhcc9Zu54uqwX2dntAFJ15A6mrSmp2qqubqwccedqt6bS1nB28Hm+48n2lgEsxTKczpXDWh7KZcfJPH9xqoq3w+3V/xo7atpEb6iYga7ZQ8A+xy5W9S346fZcnKgWj7h3bcVmePWMAVg4R1DHtyVroV5D0CptoL9zys8z+nYRZN4gix70x2JzuRIce0DAOfIdPXuAw8XdV35zKpZ/q7jQ1Wc+fyBQ8xi9zlXP2bEzWnutzsjWaAlfv2ZDyA/HD6zSCVk3zLyc8NL/+lDpyL0nPJd6ulLAHlk+Rsx/Oljt9rJjP3SKVb/8H2/0RPsgzB/+9it6DrcE8LXAOL+JQUJ8fjr536FDyrshzPfAchnmraETt7Uv3zwiH5WIvtnCQTpUxn8j19cltp/QTZ985d/DWD11Wfz9hvk9xJocfBM83Lu4FsljDQprids/wjg+RBuPmZuHQnPMb8DkE/dkRCzqFD50Ov98N3x46YEWjfPN8caBsBm/GH6+Plw8plc+x8ACG0uqpVFM9TuNV3AkDGeMF+0G+3T9e4pwTv952/PSXy9ciQPxpZt7HhUaXtwnsSKvRl0Cez/A8DCJHHOpjyAeSTltXdYXlV/+Pr+f5FSi+ngHESiAAAAAElFTkSuQmCC"
     },
     {
-      "cat": "finance",
-      "name": "Cortavo",
-      "desc": "Raise a ticket, reset a password",
-      "url": "https://portal.cortavo.com/",
-      "mark": "cortavo"
+      "cat": "companies",
+      "name": "True North K-12",
+      "desc": "Charter school development and facilities",
+      "url": "https://truenorth-k12.com/",
+      "mark": "life",
+      "icon": "data:image/png;base64,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"
+    },
+    {
+      "cat": "companies",
+      "name": "True North Holdings",
+      "desc": "Real estate investment and acquisitions",
+      "url": "https://www.true-north-holdings.com/",
+      "mark": "life",
+      "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAAYFBMVEUmIyQiHiAgHh///wBoajJlZ0BiZD1YWU9kZj8A/wD///8iHSAAAP8kSCRhYz1oakNtcEWqqlUAAAAhHyBiZD0jICFmaEBmaEBZWTQjICF/f38hHh9/fwBhZjwhHR1iYkC2LDXaAAAAIHRSTlMVbNIBDqhtCswBAaQBB4B9/wMA/v78/MkRlgL7AjdMQy164CsAAAKDSURBVHja7dvbdoIwEAXQoBFq742AFqz9/79siHVpEnJZLmaOD5m3PqjbM0FgSIWySnyTl3A+0fmzI68qAdgRVwEUQAEUQAEUQAE8PmDMqbl3HvMqCciq2a+2zBVRlVXjDOEl76VV/Jows1Y+oDvd9U73AUQBFEABFEAuQEi/1g+ewHFJgKzfa6+kWkcTeF0QcNh/9l7VaogApFTNggnsW6+igEHVe6nkggn0PuA3Ajgq2e8zMiAE/LT9k0weGqSAtk93gRbQprtADNBdOMQF1IBkBuSA1EqkB+gMDpGVyADQgibcBQ6A6UKDBMRWIg8gshKZAOb3QCIBwS6wAUICPkBAwAgwK3FAAozgiAS0/aZ5hgJavQy20AT0eWldAAXweIARClBV5wl4AZMAChDq5GbAnICZq49QwJQBNgEnA/4ETBegAGEdjYgErJWIAdx0AZTANQNQAtcMYIBLBjjAvwAIOHcBCTACaALmiS8yAZMBFqAFJ3+awQlQJ4FNYLYKoADo7owEGrCqsIBmlfeclPLmtKvQgBwB6e15joB0QJEjIJ6QdMmVSD2iSWZADUh2gX5IlegCPSCRAceYLpoBy5wwJmABjBEB06Q0LOAa1QZXomQCBLvAN6wOZPC24QLM/x4MqvEFVOP6rpu9Tjx4ArrnBdXsfbMnYH1gMXVBOgJmgJJuBtwA/QF2BuwAnYF1LPADnJUIAKjmtgsIgLUSIYBbAQZwIwABrgIUQK/EswAGuJyZgABpLlCi23qJEximDJAtOGfQAAHqS1+n1vbOqJxdNDn7B8Zd5u56Kd0zhdWkH38z+pTAdmZE41Ye4OifquyjdePXh7+ZrEr/W3+wnF1Rf2cjqhRILhNKAAAAAElFTkSuQmCC"
+    },
+    {
+      "cat": "companies",
+      "name": "True Places",
+      "desc": "Mixed-use and intergenerational community development",
+      "url": "https://www.trueplacesdevelopment.com/",
+      "mark": "life",
+      "icon": "data:image/png;base64,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"
+    },
+    {
+      "cat": "companies",
+      "name": "Elevate",
+      "desc": "Managed services backbone for every entity",
+      "url": "https://elevatemanagedservices.com/",
+      "mark": "life",
+      "icon": "data:image/png;base64,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"
     }
   ]
 }
