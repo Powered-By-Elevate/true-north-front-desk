@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Launchpad Editor</title>
+<style>
+  :root {
+    --navy: #132644;
+    --ground: #f4f6f9;
+    --card: #fff;
+    --ink: #15202d;
+    --muted: #5d6b7d;
+    --line: #dde3ea;
+    --gold: #b8943f;
+    --ok: #2f7d55;
+    --warn: #9a6415;
+    --bad: #b3261e;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  header {
+    background: var(--navy); color: #fff; padding: 18px 20px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  header h1 { margin: 0; font-size: 19px; letter-spacing: .01em; font-weight: 700; }
+  header .sub { color: #b9c6da; font-size: 13px; margin-left: auto; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 20px 16px 80px; }
+  .cols { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(0,1fr); gap: 20px; align-items: start; }
+  @media (max-width: 940px) { .cols { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 16px; }
+  .panel > h2 {
+    margin: 0; padding: 12px 16px; font-size: 13px; text-transform: uppercase;
+    letter-spacing: .07em; color: var(--muted); border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .panel > h2 .n { margin-left: auto; font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .pad { padding: 14px 16px; }
+
+  .cat-head {
+    display: flex; align-items: center; gap: 8px; padding: 12px 16px 6px;
+    font-weight: 700; font-size: 14px;
+  }
+  .cat-head input { font-weight: 700; }
+
+  .row { border-top: 1px solid var(--line); padding: 12px 16px; }
+  .row.dragging { opacity: .4; }
+  .row-top { display: flex; align-items: center; gap: 10px; }
+  .thumb {
+    width: 38px; height: 38px; flex: 0 0 38px; border-radius: 8px; background: #eef2f7;
+    display: grid; place-items: center; overflow: hidden; border: 1px solid var(--line);
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: contain; }
+  .thumb svg { width: 24px; height: 24px; }
+  .grow { flex: 1 1 auto; min-width: 0; }
+  .row-name { font-weight: 650; }
+  .row-url { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pill {
+    font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #eef2f7;
+    color: var(--muted); white-space: nowrap;
+  }
+  .pill.soon { background: #fdf3e0; color: var(--warn); }
+
+  button, .btn {
+    font: inherit; font-size: 13px; padding: 7px 12px; border-radius: 8px;
+    border: 1px solid var(--line); background: #fff; color: var(--ink); cursor: pointer;
+  }
+  button:hover { border-color: #b9c6da; }
+  button.primary { background: var(--navy); color: #fff; border-color: var(--navy); font-weight: 600; }
+  button.primary:disabled { background: #97a4b6; border-color: #97a4b6; cursor: not-allowed; }
+  button.ghost { background: transparent; }
+  button.danger { color: var(--bad); }
+  button.icon { padding: 5px 9px; line-height: 1; }
+
+  .fields { display: none; margin-top: 12px; }
+  .row.open .fields { display: block; }
+  .field { margin-bottom: 10px; }
+  .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 3px; }
+  input[type=text], input[type=url], select, textarea {
+    width: 100%; font: inherit; font-size: 15px; padding: 8px 10px;
+    border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink);
+  }
+  input:focus, select:focus { outline: 2px solid #9fc0e6; outline-offset: -1px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 560px) { .two { grid-template-columns: 1fr; } }
+  .check { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+  .check input { width: 18px; height: 18px; }
+
+  .note { font-size: 12px; color: var(--muted); margin: 4px 0 0; }
+  .note.warn { color: var(--warn); }
+  .note.bad { color: var(--bad); }
+  .note.ok { color: var(--ok); }
+
+  .bar {
+    position: sticky; bottom: 0; background: #fff; border-top: 1px solid var(--line);
+    padding: 12px 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    border-radius: 0 0 var(--radius) var(--radius);
+  }
+  .bar .spacer { margin-left: auto; }
+
+  /* preview */
+  .pv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+  .pv-tile {
+    border: 1px solid var(--line); border-radius: 10px; padding: 12px 8px; text-align: center;
+    background: #fff; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .pv-tile.soon { opacity: .55; }
+  .pv-ico { width: 40px; height: 40px; display: grid; place-items: center; }
+  .pv-ico img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .pv-ico svg { width: 32px; height: 32px; }
+  .pv-name { font-size: 12px; font-weight: 650; }
+  .pv-cat { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 14px 0 8px; }
+
+  code { background: #eef2f7; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+  .hidden { display: none !important; }
+  details summary { cursor: pointer; font-size: 13px; color: var(--muted); }
+  .diff { font-size: 13px; margin: 0; padding-left: 18px; }
+  .diff li { margin: 2px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Launchpad Editor</h1>
+  <span class="sub" id="src">loading…</span>
+</header>
+
+<div class="wrap">
+  <div class="cols">
+
+    <!-- LEFT: the inventory -->
+    <div>
+      <div class="panel">
+        <h2>The inventory <span class="n" id="count"></span></h2>
+        <div id="list"></div>
+        <div class="bar">
+          <button id="addApp">+ Add a system</button>
+          <button id="addCat" class="ghost">+ Add a section</button>
+          <span class="spacer"></span>
+          <button id="revert" class="ghost">Discard changes</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Publish</h2>
+        <div class="pad">
+          <p class="note" id="changeSummary">No changes yet.</p>
+          <ul class="diff hidden" id="diffList"></ul>
+
+          <div id="validation"></div>
+
+          <div class="bar" style="border-radius:0;border-top:1px solid var(--line);margin:12px -16px -14px;">
+            <button class="primary" id="publish" disabled>Publish to the live page</button>
+            <button id="download">Download apps.json</button>
+          </div>
+
+          <details style="margin-top:14px">
+            <summary>Where it publishes to, and the token</summary>
+            <div style="margin-top:10px">
+              <div class="two">
+                <div class="field">
+                  <label for="ghOwner">GitHub owner</label>
+                  <input type="text" id="ghOwner" placeholder="powered-by-elevate">
+                </div>
+                <div class="field">
+                  <label for="ghRepo">Repository</label>
+                  <input type="text" id="ghRepo" placeholder="true-north-launchpad">
+                </div>
+              </div>
+              <div class="two">
+                <div class="field">
+                  <label for="ghBranch">Branch</label>
+                  <input type="text" id="ghBranch" placeholder="main">
+                </div>
+                <div class="field">
+                  <label for="ghPath">File path</label>
+                  <input type="text" id="ghPath" placeholder="apps.json">
+                </div>
+              </div>
+              <div class="field">
+                <label for="ghToken">Fine-grained token (Contents: read and write, this repo only)</label>
+                <input type="text" id="ghToken" placeholder="github_pat_…" autocomplete="off" spellcheck="false">
+                <p class="note">Kept in this browser only, never sent anywhere but github.com.
+                   Mint it at <code>github.com/settings/personal-access-tokens</code>, scope it to
+                   this one repository, give it <strong>Contents: read and write</strong> and nothing
+                   else. Revoking it costs one click and breaks nothing but this button.</p>
+              </div>
+              <button id="saveCfg">Save these settings</button>
+              <span id="cfgMsg" class="note ok"></span>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: preview -->
+    <div>
+      <div class="panel">
+        <h2>Preview <span class="n">what everyone will see</span></h2>
+        <div class="pad" id="preview"></div>
+      </div>
+      <div class="panel">
+        <h2>House rules this editor enforces</h2>
+        <div class="pad">
+          <p class="note"><strong>A tile must open something.</strong> No URL means it renders as
+             "Coming soon" rather than a dead link. If clicking it will never open anything, leave
+             it off entirely.</p>
+          <p class="note"><strong>No personal links.</strong> Session, auth and tracking parameters
+             are stripped on paste. They work exactly once, for whoever copied them. A tenant
+             hostname is not personalization and is kept.</p>
+          <p class="note"><strong>The page cannot go blank.</strong> A broken or empty inventory
+             loses to the copy baked into the page, so the worst case is stale, never empty.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// The Launchpad editor.
+//
+// It edits apps.json and nothing else. The page shell, the logo library and the
+// styling all stay in index.html, which is why this tool can stay small and why
+// a mistake here can only ever change which tiles appear.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const $  = id => document.getElementById(id);
+
+let MARKS = {};          // logo library, read out of index.html
+let state = null;        // the inventory being edited
+let original = null;     // what it looked like on load, for the diff and the revert
+let openRow = null;      // which row is expanded
+
+// ── Logo library. index.html keeps every mark inline so the launcher draws
+//    itself with no network. We read that same block rather than keeping a
+//    second copy that could drift.
+async function loadMarks() {
+  try {
+    const src = await (await fetch('index.html', {cache:'no-cache'})).text();
+    const a = src.indexOf('const MARKS = {');
+    const b = src.indexOf('\n};', a);
+    if (a < 0 || b < 0) return {};
+    const body = src.slice(a + 'const MARKS ='.length, b + 2);
+    return Function('"use strict";return (' + body + ')')();
+  } catch (e) {
+    return {};   // the editor still works, it just cannot preview built-in logos
+  }
+}
+
+function iconHTML(app) {
+  if (app.icon) return `<img src="${esc(app.icon)}" alt="">`;
+  const m = MARKS[app.mark];
+  if (!m) return `<svg viewBox="0 0 24 24" fill="none" stroke="#5d6b7d" stroke-width="1.7"><circle cx="12" cy="12" r="8.6"/><path d="M12 8v5"/></svg>`;
+  if (m.img) return `<img src="${m.img}" alt="">`;
+  if (m.raw) return m.raw;
+  return `<svg viewBox="0 0 24 24" fill="${m.glyph ? 'none' : 'currentColor'}" style="color:${m.h}">${m.s}</svg>`;
+}
+
+// ── Link hygiene. Matt's standing rule, 2026-09-21: no tile URL may carry a
+//    session, auth or tracking parameter. Three of the links supplied on build
+//    day did, and each would have failed for everyone who clicked it later.
+const DIRTY = [
+  'code_challenge','code_challenge_method','state','nonce','returnurl','return_url',
+  'client_id','redirect_uri','response_type','scope','session_state','sid','session',
+  'token','access_token','id_token','auth','ticket','spstartsource','spsource',
+  'utm_source','utm_medium','utm_campaign','utm_term','utm_content','fbclid','gclid','msclkid'
+];
+
+function cleanURL(raw) {
+  const out = { url: (raw || '').trim(), stripped: [], leftover: [] };
+  if (!out.url) return out;
+  if (!/^https?:\/\//i.test(out.url) && !/^[a-z-]+:/i.test(out.url)) out.url = 'https://' + out.url;
+  let u;
+  try { u = new URL(out.url); } catch (e) { return out; }
+  if (!/^https?:$/i.test(u.protocol)) { out.url = u.href; return out; }
+  for (const k of [...u.searchParams.keys()]) {
+    if (DIRTY.includes(k.toLowerCase())) { u.searchParams.delete(k); out.stripped.push(k); }
+  }
+  out.leftover = [...u.searchParams.keys()];
+  u.hash = '';
+  out.url = u.toString().replace(/\?$/, '');
+  return out;
+}
+
+// ── Logo upload. Trim the surrounding transparency or white, square it, cap at
+//    256px. Same shape as embed_logo.py, done in the browser so adding a system
+//    never needs a terminal.
+function fileToIcon(file) {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onerror = () => reject(new Error('could not read that file'));
+    fr.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('that file is not an image the browser can read'));
+      img.onload = () => {
+        const w = img.naturalWidth, h = img.naturalHeight;
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        const x = c.getContext('2d', { willReadFrequently: true });
+        x.drawImage(img, 0, 0);
+        // find the ink
+        let x0 = w, y0 = h, x1 = -1, y1 = -1;
+        try {
+          const d = x.getImageData(0, 0, w, h).data;
+          for (let py = 0; py < h; py++) for (let px = 0; px < w; px++) {
+            const i = (py * w + px) * 4;
+            const a = d[i+3];
+            const light = d[i] > 246 && d[i+1] > 246 && d[i+2] > 246;
+            if (a > 12 && !light) {
+              if (px < x0) x0 = px; if (px > x1) x1 = px;
+              if (py < y0) y0 = py; if (py > y1) y1 = py;
+            }
+          }
+        } catch (e) { /* tainted canvas cannot happen for a local file, but do not die on it */ }
+        if (x1 < 0) { x0 = 0; y0 = 0; x1 = w - 1; y1 = h - 1; }
+        const cw = x1 - x0 + 1, ch = y1 - y0 + 1, side = Math.max(cw, ch);
+        const out = document.createElement('canvas');
+        out.width = out.height = 256;
+        const o = out.getContext('2d');
+        const scale = 256 / side;
+        o.imageSmoothingQuality = 'high';
+        o.drawImage(img, x0, y0, cw, ch,
+                    (256 - cw * scale) / 2, (256 - ch * scale) / 2, cw * scale, ch * scale);
+        resolve(out.toDataURL('image/png'));
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
+// ── Render the editor
+function render() {
+  const list = $('list');
+  list.innerHTML = state.categories.map((c, ci) => {
+    const mine = state.apps.map((a, i) => [a, i]).filter(([a]) => a.cat === c.id);
+    const rows = mine.map(([a, i]) => rowHTML(a, i)).join('') ||
+      `<div class="row"><p class="note">Nothing in this section yet.</p></div>`;
+    return `
+      <div class="cat-head">
+        <input type="text" value="${esc(c.label)}" data-cat-label="${ci}" aria-label="Section name">
+        <button class="icon ghost" data-cat-up="${ci}" ${ci === 0 ? 'disabled' : ''} title="Move section up">↑</button>
+        <button class="icon ghost" data-cat-down="${ci}" ${ci === state.categories.length - 1 ? 'disabled' : ''} title="Move section down">↓</button>
+        <button class="icon ghost danger" data-cat-del="${ci}" title="Delete section">✕</button>
+      </div>${rows}`;
+  }).join('');
+
+  $('count').textContent = `${state.apps.length} systems in ${state.categories.length} sections`;
+  renderPreview();
+  renderDiff();
+  validate();
+  wire();
+}
+
+function rowHTML(a, i) {
+  const soon = !a.url;
+  const opts = state.categories.map(c => `<option value="${esc(c.id)}" ${c.id === a.cat ? 'selected' : ''}>${esc(c.label)}</option>`).join('');
+  const markOpts = ['<option value="">(none, or upload your own below)</option>']
+    .concat(Object.keys(MARKS).sort().map(k => `<option value="${esc(k)}" ${a.mark === k && !a.icon ? 'selected' : ''}>${esc(k)}</option>`))
+    .join('');
+  return `
+  <div class="row ${openRow === i ? 'open' : ''}" data-row="${i}">
+    <div class="row-top">
+      <span class="thumb">${iconHTML(a)}</span>
+      <span class="grow">
+        <div class="row-name">${esc(a.name) || '<span style="color:#b3261e">Unnamed</span>'}</div>
+        <div class="row-url">${soon ? 'no link yet' : esc(a.url)}</div>
+      </span>
+      ${soon ? '<span class="pill soon">Coming soon</span>' : ''}
+      ${a.desktop ? '<span class="pill">desktop door</span>' : ''}
+      <button class="icon ghost" data-up="${i}" title="Move up">↑</button>
+      <button class="icon ghost" data-down="${i}" title="Move down">↓</button>
+      <button class="icon" data-edit="${i}">${openRow === i ? 'Close' : 'Edit'}</button>
+    </div>
+    <div class="fields">
+      <div class="two">
+        <div class="field"><label>Name</label>
+          <input type="text" data-f="name" data-i="${i}" value="${esc(a.name)}"></div>
+        <div class="field"><label>Section</label>
+          <select data-f="cat" data-i="${i}">${opts}</select></div>
+      </div>
+      <div class="field"><label>One line about what it is for</label>
+        <input type="text" data-f="desc" data-i="${i}" value="${esc(a.desc)}"></div>
+      <div class="field"><label>Link</label>
+        <input type="url" data-f="url" data-i="${i}" value="${esc(a.url || '')}" placeholder="https://…  (leave empty for Coming soon)">
+        <p class="note" data-urlnote="${i}"></p></div>
+      <div class="two">
+        <div class="field"><label>Logo</label>
+          <select data-f="mark" data-i="${i}">${markOpts}</select>
+          <p class="note">or <input type="file" accept="image/*" data-logo="${i}" style="font-size:12px"></p>
+          ${a.icon ? `<p class="note ok">Using an uploaded logo. <button class="icon ghost" data-clearicon="${i}">Remove it</button></p>` : ''}
+        </div>
+        <div class="field"><label>Desktop app link (optional)</label>
+          <input type="text" data-f="desktop" data-i="${i}" value="${esc(a.desktop || '')}" placeholder="ms-excel:  ·  msteams:  ·  ms-outlook:">
+          <p class="note">Adds a second "Desktop" door beside "Online". Only use a scheme the app really registers.</p></div>
+      </div>
+      <div class="field"><label>Flag (optional)</label>
+        <input type="text" data-f="note" data-i="${i}" value="${esc(a.note || '')}" placeholder="Coming soon · Needs checking"></div>
+      <div class="bar" style="border:0;padding:0;background:none">
+        <button class="danger" data-del="${i}">Remove this system</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPreview() {
+  $('preview').innerHTML = state.categories.map(c => {
+    const mine = state.apps.filter(a => a.cat === c.id)
+                           .slice().sort((a, b) => (a.url ? 0 : 1) - (b.url ? 0 : 1));
+    if (!mine.length) return '';
+    return `<div class="pv-cat">${esc(c.label)}</div><div class="pv-grid">` + mine.map(a => `
+      <div class="pv-tile ${a.url ? '' : 'soon'}">
+        <span class="pv-ico">${iconHTML(a)}</span>
+        <span class="pv-name">${esc(a.name)}</span>
+      </div>`).join('') + `</div>`;
+  }).join('') || '<p class="note">Nothing to show yet.</p>';
+}
+
+// ── What changed since load. Shown before publishing, because a launcher that
+//    the whole company opens deserves one look at the diff.
+function renderDiff() {
+  const was = new Map(original.apps.map(a => [a.name, a]));
+  const now = new Map(state.apps.map(a => [a.name, a]));
+  const lines = [];
+  for (const [n, a] of now) {
+    if (!was.has(n)) { lines.push(`Added <strong>${esc(n)}</strong>`); continue; }
+    const b = was.get(n);
+    for (const f of ['url', 'desc', 'cat', 'desktop', 'note', 'mark']) {
+      if ((a[f] || '') !== (b[f] || '')) lines.push(`<strong>${esc(n)}</strong> ${f}: <code>${esc(b[f] || 'empty')}</code> → <code>${esc(a[f] || 'empty')}</code>`);
+    }
+    if ((a.icon || '') !== (b.icon || '')) lines.push(`<strong>${esc(n)}</strong> logo changed`);
+  }
+  for (const n of was.keys()) if (!now.has(n)) lines.push(`Removed <strong>${esc(n)}</strong>`);
+  const wasCats = original.categories.map(c => c.id + ':' + c.label).join('|');
+  const nowCats = state.categories.map(c => c.id + ':' + c.label).join('|');
+  if (wasCats !== nowCats) lines.push('Sections changed');
+
+  $('diffList').innerHTML = lines.map(l => `<li>${l}</li>`).join('');
+  $('diffList').classList.toggle('hidden', !lines.length);
+  $('changeSummary').textContent = lines.length
+    ? `${lines.length} change${lines.length > 1 ? 's' : ''} ready to publish.`
+    : 'No changes yet.';
+  return lines.length;
+}
+
+// ── Validation. These are the conditions under which the live page would look
+//    broken, so the publish button stays off until they are all clear.
+function validate() {
+  const errs = [], warns = [];
+  if (!state.categories.length) errs.push('There are no sections.');
+  if (!state.apps.length) errs.push('There are no systems.');
+  const ids = new Set(state.categories.map(c => c.id));
+  const seen = new Set();
+  state.apps.forEach(a => {
+    if (!a.name || !a.name.trim()) errs.push('A system has no name.');
+    else if (seen.has(a.name.toLowerCase())) errs.push(`Two systems are both called "${a.name}".`);
+    else seen.add(a.name.toLowerCase());
+    if (!ids.has(a.cat)) errs.push(`"${a.name || 'a system'}" is in a section that no longer exists.`);
+    if (!a.desc || !a.desc.trim()) warns.push(`"${a.name}" has no description.`);
+    if (a.url) {
+      try { const u = new URL(a.url); if (!/^https?:$/.test(u.protocol)) warns.push(`"${a.name}" does not use https.`); }
+      catch (e) { errs.push(`"${a.name}" has a link the browser cannot read.`); }
+      const c = cleanURL(a.url);
+      if (c.leftover.length) warns.push(`"${a.name}" still carries a parameter: ${c.leftover.join(', ')}. Check it is not personal to you.`);
+    }
+  });
+  if (!state.apps.some(a => ids.has(a.cat))) errs.push('No system lands in a real section, so the page would be empty.');
+
+  $('validation').innerHTML =
+    errs.map(e => `<p class="note bad">✕ ${esc(e)}</p>`).join('') +
+    warns.map(w => `<p class="note warn">! ${esc(w)}</p>`).join('') +
+    (!errs.length && !warns.length ? '<p class="note ok">✓ Everything checks out.</p>' : '');
+
+  const changed = $('diffList').children.length > 0;
+  $('publish').disabled = !!errs.length || !changed;
+  return !errs.length;
+}
+
+// ── Wiring
+function wire() {
+  document.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.edit; openRow = (openRow === i) ? null : i; render();
+  });
+  document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.del;
+    if (!confirm(`Remove ${state.apps[i].name} from the Launchpad?`)) return;
+    state.apps.splice(i, 1); openRow = null; render();
+  });
+  document.querySelectorAll('[data-up]').forEach(b => b.onclick = () => move(+b.dataset.up, -1));
+  document.querySelectorAll('[data-down]').forEach(b => b.onclick = () => move(+b.dataset.down, 1));
+
+  document.querySelectorAll('[data-f]').forEach(el => {
+    const i = +el.dataset.i, f = el.dataset.f;
+    el.oninput = () => {
+      if (f === 'url') return;                       // url is handled on blur, so cleaning does not fight typing
+      state.apps[i][f] = el.value;
+      if (f === 'mark' && el.value) delete state.apps[i].icon;
+      softRefresh();
+    };
+    if (f === 'url') el.onblur = () => {
+      const c = cleanURL(el.value);
+      state.apps[i].url = c.url || null;
+      el.value = c.url;
+      const n = document.querySelector(`[data-urlnote="${i}"]`);
+      if (n) {
+        n.className = 'note' + (c.stripped.length ? ' warn' : c.leftover.length ? ' warn' : '');
+        n.innerHTML = c.stripped.length
+          ? `Stripped ${c.stripped.length} personal or tracking parameter${c.stripped.length > 1 ? 's' : ''}: <code>${esc(c.stripped.join(', '))}</code>`
+          : c.leftover.length ? `Still carries <code>${esc(c.leftover.join(', '))}</code>. Check that is not personal to you.` : '';
+      }
+      softRefresh();
+    };
+    if (f === 'cat') el.onchange = () => { state.apps[i].cat = el.value; render(); };
+  });
+
+  document.querySelectorAll('[data-logo]').forEach(inp => inp.onchange = async () => {
+    const i = +inp.dataset.logo, f = inp.files && inp.files[0];
+    if (!f) return;
+    try { state.apps[i].icon = await fileToIcon(f); render(); }
+    catch (e) { alert(e.message); }
+  });
+  document.querySelectorAll('[data-clearicon]').forEach(b => b.onclick = () => {
+    delete state.apps[+b.dataset.clearicon].icon; render();
+  });
+
+  document.querySelectorAll('[data-cat-label]').forEach(el => el.oninput = () => {
+    state.categories[+el.dataset.catLabel].label = el.value; softRefresh();
+  });
+  document.querySelectorAll('[data-cat-up]').forEach(b => b.onclick = () => moveCat(+b.dataset.catUp, -1));
+  document.querySelectorAll('[data-cat-down]').forEach(b => b.onclick = () => moveCat(+b.dataset.catDown, 1));
+  document.querySelectorAll('[data-cat-del]').forEach(b => b.onclick = () => {
+    const ci = +b.dataset.catDel, c = state.categories[ci];
+    const n = state.apps.filter(a => a.cat === c.id).length;
+    if (n) return alert(`"${c.label}" still holds ${n} system${n > 1 ? 's' : ''}. Move or remove them first.`);
+    state.categories.splice(ci, 1); render();
+  });
+}
+
+// Update the light parts without losing focus in the field being typed into.
+function softRefresh() { renderPreview(); renderDiff(); validate(); }
+
+function move(i, d) {
+  const a = state.apps[i], cat = a.cat;
+  const sibs = state.apps.map((x, k) => [x, k]).filter(([x]) => x.cat === cat).map(([, k]) => k);
+  const at = sibs.indexOf(i), to = sibs[at + d];
+  if (to === undefined) return;
+  state.apps[i] = state.apps[to]; state.apps[to] = a;
+  openRow = null; render();
+}
+function moveCat(ci, d) {
+  const to = ci + d;
+  if (to < 0 || to >= state.categories.length) return;
+  const t = state.categories[ci];
+  state.categories[ci] = state.categories[to];
+  state.categories[to] = t;
+  render();
+}
+
+$('addApp').onclick = () => {
+  if (!state.categories.length) return alert('Add a section first.');
+  state.apps.push({ cat: state.categories[0].id, name: 'New system', desc: '', url: null, mark: 'life' });
+  openRow = state.apps.length - 1;
+  render();
+  document.querySelector(`[data-row="${openRow}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+};
+$('addCat').onclick = () => {
+  const label = prompt('What is the section called?');
+  if (!label || !label.trim()) return;
+  const id = label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || ('s' + Date.now());
+  if (state.categories.some(c => c.id === id)) return alert('There is already a section with that name.');
+  state.categories.push({ id, label: label.trim() });
+  render();
+};
+$('revert').onclick = () => {
+  if (!confirm('Throw away every change since this page loaded?')) return;
+  state = structuredClone(original); openRow = null; render();
+};
+
+// ── Output
+function serialise() {
+  return JSON.stringify({
+    $comment: 'The Launchpad inventory. Edit through edit.html, not by hand.',
+    categories: state.categories,
+    apps: state.apps
+  }, null, 2) + '\n';
+}
+
+$('download').onclick = () => {
+  const b = new Blob([serialise()], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b); a.download = 'apps.json'; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+};
+
+// ── GitHub settings, kept in this browser
+const CFG = 'launchpad.publish.cfg';
+function cfg() {
+  try { return JSON.parse(localStorage.getItem(CFG) || '{}'); } catch (e) { return {}; }
+}
+function loadCfg() {
+  const c = cfg();
+  $('ghOwner').value  = c.owner  || 'powered-by-elevate';
+  $('ghRepo').value   = c.repo   || '';
+  $('ghBranch').value = c.branch || 'main';
+  $('ghPath').value   = c.path   || 'apps.json';
+  $('ghToken').value  = c.token  || '';
+}
+$('saveCfg').onclick = () => {
+  try {
+    localStorage.setItem(CFG, JSON.stringify({
+      owner: $('ghOwner').value.trim(), repo: $('ghRepo').value.trim(),
+      branch: $('ghBranch').value.trim() || 'main', path: $('ghPath').value.trim() || 'apps.json',
+      token: $('ghToken').value.trim()
+    }));
+    $('cfgMsg').textContent = 'Saved in this browser.';
+  } catch (e) { $('cfgMsg').textContent = 'This browser will not store it, so publishing needs the token pasted each time.'; }
+  setTimeout(() => $('cfgMsg').textContent = '', 3000);
+};
+
+$('publish').onclick = async () => {
+  const c = {
+    owner: $('ghOwner').value.trim(), repo: $('ghRepo').value.trim(),
+    branch: $('ghBranch').value.trim() || 'main', path: $('ghPath').value.trim() || 'apps.json',
+    token: $('ghToken').value.trim()
+  };
+  if (!c.owner || !c.repo || !c.token)
+    return alert('Open "Where it publishes to" below and fill in the repository and the token first.');
+
+  const btn = $('publish'), was = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Publishing…';
+  const api = `https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`;
+  const H = { Authorization: 'Bearer ' + c.token, Accept: 'application/vnd.github+json' };
+  try {
+    // The sha of what is live, so two people editing cannot silently overwrite each other.
+    let sha;
+    const cur = await fetch(`${api}?ref=${encodeURIComponent(c.branch)}`, { headers: H });
+    if (cur.ok) sha = (await cur.json()).sha;
+    else if (cur.status !== 404) throw new Error(`reading the current file returned ${cur.status}`);
+
+    const body = {
+      message: 'Launchpad: update the inventory',
+      content: btoa(String.fromCharCode(...new TextEncoder().encode(serialise()))),
+      branch: c.branch, ...(sha ? { sha } : {})
+    };
+    const put = await fetch(api, { method: 'PUT', headers: { ...H, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (!put.ok) throw new Error(`GitHub refused it with ${put.status}: ${(await put.text()).slice(0, 300)}`);
+
+    original = structuredClone(state);
+    render();
+    alert('Published. The live page picks it up within about a minute.');
+  } catch (e) {
+    alert('Nothing was published.\n\n' + e.message);
+  } finally {
+    btn.textContent = was; btn.disabled = false; validate();
+  }
+};
+
+// ── Boot
+(async function () {
+  MARKS = await loadMarks();
+  try {
+    const r = await fetch('apps.json', { cache: 'no-cache' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    if (!Array.isArray(d.categories) || !Array.isArray(d.apps)) throw new Error('apps.json is not the right shape');
+    state = { categories: d.categories, apps: d.apps };
+    $('src').textContent = `${Object.keys(MARKS).length} logos available`;
+  } catch (e) {
+    $('src').textContent = 'could not read apps.json';
+    document.querySelector('.wrap').insertAdjacentHTML('afterbegin',
+      `<div class="panel"><div class="pad"><p class="note bad">
+        Could not load <code>apps.json</code> (${esc(e.message)}). This editor has to be opened
+        from the same place the Launchpad is served from, over http or https. Opening the file
+        straight off disk will not work, because the browser refuses to read a neighbouring file.
+      </p></div></div>`);
+    state = { categories: [], apps: [] };
+  }
+  original = structuredClone(state);
+  loadCfg();
+  render();
+})();
+</script>
+</body>
+</html>

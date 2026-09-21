@@ -1,0 +1,168 @@
+{
+  "$comment": "The Launchpad inventory. Edit through edit.html, not by hand.",
+  "categories": [
+    {
+      "id": "comms",
+      "label": "Communicate"
+    },
+    {
+      "id": "construction",
+      "label": "Construction"
+    },
+    {
+      "id": "finance",
+      "label": "Finance & admin"
+    },
+    {
+      "id": "pipeline",
+      "label": "Pipeline"
+    },
+    {
+      "id": "create",
+      "label": "Create"
+    }
+  ],
+  "apps": [
+    {
+      "cat": "comms",
+      "name": "Teams",
+      "desc": "Project teams, channels, chat",
+      "url": "https://teams.microsoft.com",
+      "desktop": "msteams:",
+      "mark": "teams"
+    },
+    {
+      "cat": "comms",
+      "name": "Outlook",
+      "desc": "Work email and calendar",
+      "url": "https://outlook.office.com/mail/",
+      "desktop": "ms-outlook:",
+      "mark": "outlook"
+    },
+    {
+      "cat": "comms",
+      "name": "True North University",
+      "desc": "Our SharePoint: docs, training, IT helpdesk",
+      "url": "https://truenorthcompanies.sharepoint.com/sites/TrueNorthUniversity",
+      "mark": "sharepoint"
+    },
+    {
+      "cat": "comms",
+      "name": "OneDrive",
+      "desc": "Your own files, synced",
+      "url": "https://www.office.com/launch/onedrive",
+      "desktop": "onedrive:",
+      "mark": "onedrive"
+    },
+    {
+      "cat": "comms",
+      "name": "ShareFile",
+      "desc": "Share files outside the company",
+      "url": "https://truenorthcompanies.sharefile.com/",
+      "mark": "sharefile"
+    },
+    {
+      "cat": "construction",
+      "name": "Procore",
+      "desc": "Budgets, contracts, COs, invoices",
+      "url": "https://app.procore.com",
+      "mark": "procore"
+    },
+    {
+      "cat": "construction",
+      "name": "Bluebeam",
+      "desc": "Drawing markups and takeoffs",
+      "url": "https://signin.bluebeam.com/",
+      "mark": "bluebeam"
+    },
+    {
+      "cat": "finance",
+      "name": "Sage Intacct",
+      "desc": "General ledger and actuals",
+      "url": "https://www.intacct.com/ia/acct/login.phtml",
+      "mark": "sage"
+    },
+    {
+      "cat": "finance",
+      "name": "Ramp",
+      "desc": "Cards, bills, expense reports",
+      "url": "https://app.ramp.com",
+      "mark": "ramp"
+    },
+    {
+      "cat": "finance",
+      "name": "Financial Dashboard",
+      "desc": "Backlog, WIP, revenue bridge",
+      "url": null,
+      "note": "Coming soon",
+      "mark": "chart"
+    },
+    {
+      "cat": "pipeline",
+      "name": "Monday",
+      "desc": "Pipeline boards, all four companies",
+      "url": "https://true-north-companies-force.monday.com",
+      "mark": "monday"
+    },
+    {
+      "cat": "pipeline",
+      "name": "Front Desk",
+      "desc": "Log an opportunity or a new contact",
+      "url": "https://powered-by-elevate.github.io/true-north-front-desk/",
+      "mark": "frontdesk"
+    },
+    {
+      "cat": "pipeline",
+      "name": "Contacts",
+      "desc": "Everyone we know, by company",
+      "url": null,
+      "note": "Coming soon",
+      "mark": "people"
+    },
+    {
+      "cat": "create",
+      "name": "Canva",
+      "desc": "Decks, bank packages, brand kits",
+      "url": "https://www.canva.com",
+      "mark": "canva"
+    },
+    {
+      "cat": "create",
+      "name": "Excel",
+      "desc": "Proformas and financial models",
+      "url": "https://www.office.com/launch/excel",
+      "mark": "excel",
+      "desktop": "ms-excel:"
+    },
+    {
+      "cat": "create",
+      "name": "Word",
+      "desc": "Letters, memos, proposals",
+      "url": "https://www.office.com/launch/word",
+      "mark": "word",
+      "desktop": "ms-word:"
+    },
+    {
+      "cat": "create",
+      "name": "PowerPoint",
+      "desc": "Decks and presentations",
+      "url": "https://www.office.com/launch/powerpoint",
+      "mark": "powerpoint",
+      "desktop": "ms-powerpoint:"
+    },
+    {
+      "cat": "finance",
+      "name": "ADP",
+      "desc": "Time off, benefits, pay stubs",
+      "url": "https://my.adp.com",
+      "mark": "adp"
+    },
+    {
+      "cat": "finance",
+      "name": "Cortavo",
+      "desc": "Raise a ticket, reset a password",
+      "url": "https://portal.cortavo.com/",
+      "mark": "cortavo"
+    }
+  ]
+}
