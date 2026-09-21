@@ -145,24 +145,21 @@
       "name": "Excel",
       "desc": "Proformas and financial models",
       "url": "https://www.office.com/launch/excel",
-      "mark": "excel",
-      "desktop": "ms-excel:"
+      "mark": "excel"
     },
     {
       "cat": "create",
       "name": "Word",
       "desc": "Letters, memos, proposals",
       "url": "https://www.office.com/launch/word",
-      "mark": "word",
-      "desktop": "ms-word:"
+      "mark": "word"
     },
     {
       "cat": "create",
       "name": "PowerPoint",
       "desc": "Decks and presentations",
       "url": "https://www.office.com/launch/powerpoint",
-      "mark": "powerpoint",
-      "desktop": "ms-powerpoint:"
+      "mark": "powerpoint"
     }
   ]
 }
