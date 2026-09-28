@@ -2,8 +2,8 @@
   "$comment": "The Launchpad inventory. Primary route: ask Claude to change it (reads and writes this file straight over the GitHub API, see tools/launcher/ROLLOUT.md in agentic-os). Fallback with no Claude: open edit.html beside this file. Editing by hand is the last resort, and a trailing comma here blanks nothing because index.html falls back to its baked copy.",
   "categories": [
     {
-      "id": "comms",
-      "label": "Communicate"
+      "id": "communication",
+      "label": "Communication"
     },
     {
       "id": "construction",
@@ -11,24 +11,44 @@
     },
     {
       "id": "finance",
-      "label": "Finance & admin"
+      "label": "Finance"
+    },
+    {
+      "id": "employee",
+      "label": "Employee"
     },
     {
       "id": "pipeline",
-      "label": "Pipeline"
+      "label": "Pipeline / Work Management"
     },
     {
       "id": "create",
       "label": "Create"
     },
     {
+      "id": "ai",
+      "label": "AI / Automation"
+    },
+    {
+      "id": "knowledge",
+      "label": "Knowledge / Library"
+    },
+    {
+      "id": "assets",
+      "label": "Asset Management"
+    },
+    {
+      "id": "it",
+      "label": "IT / Support"
+    },
+    {
       "id": "companies",
-      "label": "Our companies"
+      "label": "Our Companies"
     }
   ],
   "apps": [
     {
-      "cat": "comms",
+      "cat": "communication",
       "name": "Teams",
       "desc": "Project teams, channels, chat",
       "url": "https://teams.microsoft.com",
@@ -36,7 +56,7 @@
       "mark": "teams"
     },
     {
-      "cat": "comms",
+      "cat": "communication",
       "name": "Outlook",
       "desc": "Work email and calendar",
       "url": "https://outlook.office.com/mail/",
@@ -44,21 +64,21 @@
       "mark": "outlook"
     },
     {
-      "cat": "comms",
+      "cat": "knowledge",
       "name": "True North University",
       "desc": "Our SharePoint: docs, training, IT helpdesk",
       "url": "https://truenorthcompanies.sharepoint.com/sites/TrueNorthUniversity",
       "mark": "sharepoint"
     },
     {
-      "cat": "comms",
+      "cat": "knowledge",
       "name": "OneDrive",
       "desc": "Your own files, synced",
       "url": "https://www.office.com/launch/onedrive",
       "mark": "onedrive"
     },
     {
-      "cat": "comms",
+      "cat": "knowledge",
       "name": "ShareFile",
       "desc": "Share files outside the company",
       "url": "https://truenorthcompanies.sharefile.com/",
@@ -93,14 +113,14 @@
       "mark": "ramp"
     },
     {
-      "cat": "finance",
+      "cat": "employee",
       "name": "ADP",
       "desc": "Time off, benefits, pay stubs",
       "url": "https://my.adp.com",
       "mark": "adp"
     },
     {
-      "cat": "finance",
+      "cat": "employee",
       "name": "Employee Navigator",
       "desc": "Benefits enrollment and your elections",
       "url": "https://www.employeenavigator.com/",
@@ -108,15 +128,15 @@
       "icon": "data:image/png;base64,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"
     },
     {
-      "cat": "finance",
+      "cat": "employee",
       "name": "My Plan Connection",
       "desc": "Set up and track your retirement",
-      "url": "https://myplanconnection.com/Login-Landing?returnurl=%2f",
+      "url": "https://myplanconnection.com/Login-Landing",
       "mark": "life",
       "icon": "data:image/png;base64,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"
     },
     {
-      "cat": "finance",
+      "cat": "it",
       "name": "Cortavo",
       "desc": "Raise a ticket, reset a password",
       "url": "https://portal.cortavo.com/",
@@ -151,6 +171,14 @@
       "url": null,
       "note": "Coming soon",
       "mark": "people"
+    },
+    {
+      "cat": "pipeline",
+      "name": "Planner",
+      "desc": "Tasks and plans, yours and your teams'",
+      "url": "https://planner.cloud.microsoft/",
+      "mark": "life",
+      "icon": "data:image/svg+xml;utf8,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#5d6b7d\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"%3E%3Crect x=\"4.5\" y=\"3.5\" width=\"15\" height=\"17\" rx=\"2.5\"/%3E%3Cpath d=\"M8.3 9.3l1.6 1.6 3.1-3.3\"/%3E%3Cpath d=\"M8.3 15.3l1.6 1.6 3.1-3.3\"/%3E%3Cpath d=\"M15.2 9.6h1.4M15.2 15.6h1.4\"/%3E%3C/svg%3E"
     },
     {
       "cat": "create",
